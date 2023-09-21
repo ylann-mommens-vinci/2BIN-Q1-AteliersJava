@@ -14,15 +14,12 @@ public class Plat {
 
     private HashSet<IngredientQuantifie> ingredients;
     private ArrayList<Instruction> recette;
-    private Type typePlat;
 
-    public Plat(String nom, int nbPersonnes, Difficulte niveauDeDifficulte, Cout cout,Type typePlat){
+    public Plat(String nom, int nbPersonnes, Difficulte niveauDeDifficulte, Cout cout){
         this.nom = nom;
         this.nbPersonnes = nbPersonnes;
         this.niveauDeDifficulte = niveauDeDifficulte;
         this.cout = cout;
-        this.typePlat=typePlat;
-
         this.dureeEnMinutes = Duration.ofMinutes(0);
 
         recette = new ArrayList<>();
@@ -44,7 +41,6 @@ public class Plat {
     public Duration getDureeEnMinutes() {
         return dureeEnMinutes;
     }
-    public Type getTypePlat(){return typePlat;}
 
     /**
      * insère l’instruction à la position précisée, position commençant à 1.
@@ -203,9 +199,7 @@ public class Plat {
         return res;
     }
 
-    public enum Type {
-        ENTREE,PLAT,DESSERT;
-    }
+
     public enum Difficulte{
         X,XX,XXX,XXXX,XXXXX;
 

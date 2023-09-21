@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
         Plat plat = null;
-        plat = new Plat("Waterzooi", 4, Difficulte.XX, Cout.$$$, Plat.Type.PLAT);
+        plat = new Plat("Waterzooi", 4, Difficulte.XX, Cout.$$$);
 
         Instruction instruction = new Instruction("Couper les légumes", 15);
         try {
