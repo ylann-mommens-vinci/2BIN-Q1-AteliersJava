@@ -1,12 +1,14 @@
 package domaine;
 
 import java.util.Objects;
+import util.Util;
+
 
 public class Ingredient {
     private final String nom;
 
     public Ingredient(String nom) {
-        util.checkString(nom);
+        Util.checkString(nom);
         this.nom = nom;
     }
 
