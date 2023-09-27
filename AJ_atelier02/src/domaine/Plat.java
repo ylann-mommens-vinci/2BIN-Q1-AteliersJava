@@ -1,29 +1,26 @@
 package domaine;
 
+import util.Util;
+
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class Plat {
     private String nom;
     private int nbPersonnes;
     private  Difficulte niveauDeDifficulte;
     private Cout cout;
-    private Duration dureeEnMinutes;
+    private Duration dureeEnMinutes = Duration.ofMinutes(0);
 
-    private HashSet<IngredientQuantifie> ingredients;
-    private ArrayList<Instruction> recette;
+
+    private List<Instruction> recette = new ArrayList<Instruction>();
+    private Set<IngredientQuantifie> ingredients = new HashSet<IngredientQuantifie>();
 
     public Plat(String nom, int nbPersonnes, Difficulte niveauDeDifficulte, Cout cout){
         this.nom = nom;
         this.nbPersonnes = nbPersonnes;
         this.niveauDeDifficulte = niveauDeDifficulte;
         this.cout = cout;
-        this.dureeEnMinutes = Duration.ofMinutes(0);
-
-        recette = new ArrayList<>();
-        ingredients =new HashSet<>();
     }
 
     public String getNom() {
@@ -50,8 +47,13 @@ public class Plat {
 *                                  ou est trop grande par rapport au nombre d’instructions déjà présentes
      */
     public void insererInstruction(int position, Instruction instruction){
-        if(position<=0 ||position> recette.size())
+        Util.checkStrictlyPositive(position);
+        Util.checkObject(instruction);
+        if(position > recette.size()+1)
             throw new IllegalArgumentException();
+
+        recette.add(position-1,instruction);
+        dureeEnMinutes = dureeEnMinutes.plus(instruction.getDureeEnMinutes());
     }
 
     /**
@@ -59,7 +61,10 @@ public class Plat {
      * @param instruction
      */
     public void ajouterInstruction (Instruction instruction){
+        Util.checkObject(instruction);
+
         recette.add(instruction);
+        dureeEnMinutes.plus(instruction.getDureeEnMinutes());
     }
 
     /**
@@ -69,8 +74,14 @@ public class Plat {
      * @return renvoie l’instruction qui a été remplacée
      */
     public Instruction remplacerInstruction (int position, Instruction instruction){
-        recette.add(position,instruction);
-        return recette.get(position);
+        Util.checkStrictlyPositive(position);
+        Util.checkObject(instruction);
+        if(position > recette.size()) throw new IllegalArgumentException();
+
+        Instruction i = recette.set(position-1,instruction);
+        dureeEnMinutes = dureeEnMinutes.minus(i.getDureeEnMinutes());
+        dureeEnMinutes = dureeEnMinutes.plus(instruction.getDureeEnMinutes());
+        return i;
     }
 
     /**
@@ -79,7 +90,12 @@ public class Plat {
      * @return renvoie l’instruction qui a été supprimée
      */
     public Instruction supprimerInstruction (int position){
-        return recette.remove(position);
+        Util.checkStrictlyPositive(position);
+        if (position > recette.size() ) throw new IllegalArgumentException();
+
+        Instruction instructionSupprimee = recette.remove(position-1);
+        dureeEnMinutes = dureeEnMinutes.minus(instructionSupprimee.getDureeEnMinutes());
+        return instructionSupprimee;
     }
 
     /**
@@ -88,8 +104,7 @@ public class Plat {
      * @return
      */
     public Iterator<Instruction> instructions(){
-        //TODO a  verif
-        return recette.iterator();
+        return Collections.unmodifiableList(recette).iterator();
     }
 
 
@@ -101,12 +116,11 @@ public class Plat {
      * @return Cela renvoie false si l’ingrédient est déjà présent
      */
     public boolean ajouterIngredient(Ingredient ingredient, int quantite, Unite unite){
-        IngredientQuantifie iq = new IngredientQuantifie(ingredient,quantite,unite);
+        Util.checkObject(unite);
+        Util.checkStrictlyPositive(quantite);
+        if (trouverIngredientQuantifie(ingredient) != null) return false;
 
-        if(ingredients.contains(iq))
-            return false;
-
-        ingredients.add(iq);
+        ingredients.add(new IngredientQuantifie(ingredient,quantite,unite));
         return true;
     }
 
@@ -118,12 +132,7 @@ public class Plat {
      * @return
      */
     public boolean ajouterIngredient(Ingredient ingredient, int quantite){
-        IngredientQuantifie iq = new IngredientQuantifie(ingredient,quantite,Unite.NEANT);
-        if(ingredients.contains(iq))
-            return false;
-
-        ingredients.add(iq);
-        return true;
+        return ajouterIngredient(ingredient,quantite,Unite.NEANT);
     }
 
     /**
@@ -134,20 +143,14 @@ public class Plat {
      * @return renvoie false si l’ingredient n’est pas présent.
      */
     public boolean modifierIngredient(Ingredient ingredient, int quantite, Unite unite){
-        //TODO a verif
-        if(!ingredients.contains(ingredient))
-            return false;
-        //On boucle dans le hashSet
-        for (IngredientQuantifie iq : ingredients) {
-            Ingredient x = iq.getIngredient();
-            //Quand on tombe sur l'ingredient on le modifie
-            if(x.equals(ingredient)){
-                iq.setQuantite(quantite);
-                iq.setUnite(unite);
-                return true;
-            }
-        }
-        return false;
+        Util.checkObject(unite);
+        Util.checkStrictlyPositive(quantite);
+        IngredientQuantifie ingredientQuantifie = trouverIngredientQuantifie(ingredient);
+        if (ingredientQuantifie == null) return false;
+
+        ingredientQuantifie.setQuantite(quantite);
+        ingredientQuantifie.setUnite(unite);
+        return true;
     }
 
     /**
@@ -156,11 +159,9 @@ public class Plat {
      * @return  renvoie false si l’ingredient n’est pas présent
      */
     public boolean supprimerIngredient(Ingredient ingredient){
-        //TODO a verif
-        if(ingredients.contains(ingredient)){
-            return ingredients.remove(ingredient);
-        }
-        return false;
+        IngredientQuantifie ingredientQuantifie = trouverIngredientQuantifie(ingredient);
+        if (ingredientQuantifie == null) return false;
+        return ingredients.remove(ingredientQuantifie);
     }
 
     /**
@@ -169,7 +170,6 @@ public class Plat {
      *          ou null si l’ingredient n’est pas présent
      */
     public IngredientQuantifie trouverIngredientQuantifie(Ingredient ingredient){
-        //TODO a verif
         for (IngredientQuantifie iq: ingredients) {
             if(iq.getIngredient().equals(ingredient)){
                 return iq;
@@ -209,18 +209,10 @@ public class Plat {
         }
     }
     public enum Cout{
-        $("€"),$$("€€"),$$$("€€€"),$$$$("€€€€"),$$$$$("€€€€€");
-        private String symbole;
-        Cout(String symbole){
-            this.symbole=symbole;
-        }
-
-        public String getSymbole() {
-            return symbole;
-        }
-
+        $,$$,$$$,$$$$,$$$$$;
+        @Override
         public String toString() {
-            return getSymbole();
+            return super.toString().replace("$","€");
         }
     }
 }
