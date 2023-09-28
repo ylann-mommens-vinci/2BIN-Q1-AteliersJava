@@ -60,11 +60,23 @@ public class ExercicesOptional {
 
     private void optional1() {
         System.out.println("optional1");
+        //TODO exercice optionnel 1
+        var valeur = transactions.stream()
+                .map(Transaction::getValue)
+                .reduce(Integer::max)
+                .orElse(-1);
+        System.out.println(valeur);
     }
 
     private void optional2() {
         System.out.println("optional2");
+        var valeur = transactions.stream()
+                .map(Transaction::getValue)
+                .reduce(Integer::max);
 
+        System.out.println(valeur.isPresent() ?
+                                "Valeur : " + valeur.get()
+                                : "Aucune valeur minimale trouvée.");
     }
 
 }
