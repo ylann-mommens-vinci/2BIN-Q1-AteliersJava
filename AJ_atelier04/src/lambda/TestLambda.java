@@ -51,5 +51,21 @@ public class TestLambda {
         List<Integer> result3 = Lambda.transformAll(list2,String::length);
         //List<Integer> result3 = Lambda.transformAll(list2,e -> e.length());
         System.out.println(result3);
+
+        System.out.println("-----------------");
+        result = Lambda.filter(list,e -> e>200);
+        System.out.println(result);
+
+        result = Lambda.filter(list,e -> e%2==0);
+        System.out.println(result);
+
+        result = Lambda.filter(list,e -> Integer.toString(e).charAt(0)==1);
+        System.out.println(result);
+
+        result = Lambda.map(list,e -> e*2);
+        System.out.println(result);
+
+        result = Lambda.map(list,e -> e-25);
+        System.out.println(result);
     }
 }

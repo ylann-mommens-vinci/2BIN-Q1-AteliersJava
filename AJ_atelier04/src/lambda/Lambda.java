@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Lambda {
 
@@ -40,5 +41,11 @@ public class Lambda {
         return temp;
     }
 
+    public static <T>  List<T> filter(List<T> list,Predicate<T> match){
+        return list.stream().filter(match).collect(Collectors.toList());
+    }
 
+    public static <T, R> List<T> map(List<R> list, Function<R,T> transform){
+        return list.stream().map(transform).collect(Collectors.toList());
+    }
 }
