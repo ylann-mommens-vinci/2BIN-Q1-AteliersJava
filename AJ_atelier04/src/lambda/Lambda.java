@@ -45,7 +45,7 @@ public class Lambda {
         return list.stream().filter(match).collect(Collectors.toList());
     }
 
-    public static <T, R> List<T> map(List<R> list, Function<R,T> transform){
+    public static <P, R> List<R> map(List<P> list, Function<P, R> transform) {
         return list.stream().map(transform).collect(Collectors.toList());
     }
 }
