@@ -1,10 +1,15 @@
 package employee;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EmployeeManagement {
@@ -15,9 +20,15 @@ public class EmployeeManagement {
      * Complétez la fonction pour créer le Stream à partir du fichier streamingvf.cvs
      */
     private static final Supplier<Stream<String>> supplier = () -> {
-        //TODO: retourner un stream créer à partir du fichier. Aidez vous de la p.15 : "Créer des streams"
+        //TODO done: retourner un stream créer à partir du fichier. Aidez vous de la p.15 : "Créer des streams"
         //      En cas d'IOException, vous devez lancer une UncheckedIOException
-        return null;
+        try {
+            String path = "AJ_atelier04/resources/streamingvf.csv";     //On prend le chemin du fichier
+            FileReader file = new FileReader(path);                     //On le convertie en Lecture fichier
+            return new BufferedReader(file).lines();
+        }catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     };
 
     public static void main(String[] args) {
@@ -41,8 +52,9 @@ public class EmployeeManagement {
      * @return une String contenant la première ligne du fichier
      */
     private static String firstLine() {
-        //TODO
-        return null;
+        //TODO done
+        //String s = supplier.get().findFirst().isPresent ? supplier.get().findFirst() : "Pas de première ligne";
+        return supplier.get().findFirst().orElse("Pas de premier ligne");
     }
 
 
@@ -53,9 +65,12 @@ public class EmployeeManagement {
      */
     private static List<String> filteredLastnames() {
         Predicate<String> predicate = s -> s.length() > 8;
-        //TODO: combiner predicate avec d'autres  (p.7 : "Predicate"), puis le passer en paramètre de
+        //TODO done: combiner predicate avec d'autres  (p.7 : "Predicate"), puis le passer en paramètre de
         //      de l'appel filter() pour filtrer les résultats.
-        return null;
+        return supplier.get()
+                .map(s -> s.split(";")[1])      //On cherche dans une ligne le deuxième élément (celui qui comprend le lastNames)
+                .filter(predicate)              //On filtre pas taille
+                .collect(Collectors.toList());  //On transforme en liste
     }
 
     /**
@@ -77,8 +92,10 @@ public class EmployeeManagement {
      * @return true si tous les emails se terminent par "streamingvf.be", false sinon
      */
     private static boolean allEmailCorrect() {
-        //TODO
-        return false;
+        //TODO done
+        return supplier.get()
+                .map(s -> s.split(";")[3])                      //On récupere le 3eme élément de la ligne
+                .allMatch(s -> s.endsWith("streamingvf.be"));         //On verifie qu'il fini par "streamingvf.be"
     }
 
     /**
@@ -87,8 +104,11 @@ public class EmployeeManagement {
      * @return une String contenant un prénom ou "None"
      */
     private static String longLastName() {
-        //TODO
-        return "None";
+        //TODO done
+        return supplier.get()
+                .map(s -> s.split(";")[1])      //on récupère le nom
+                .filter(s -> s.length()>14)             //Si il fait plus de 14 de long
+                .findFirst().orElse("None");        //On renvoie le premier ou none si il y a rien
     }
 
     /**
@@ -96,8 +116,11 @@ public class EmployeeManagement {
      * @return le nombre d'employé à mi-temps de la boîte
      */
     private static long numbreOfPartTimers() {
-        //TODO
-        return 0;
+        //TODO done
+        return supplier.get()
+                .map(s -> s.split(";")[4])          //On récupere tout les type de poste
+                .map(s -> s.equals("MT"))                   //On garde que ceux a "MT"
+                .count();                                   //On compte le résultat
     }
 
     /**
@@ -116,8 +139,11 @@ public class EmployeeManagement {
      * @param consumer un consommateur de Stream de String.
      */
     private static void withLines(Consumer<Stream<String>> consumer) {
-        //TODO: try-with-resources avec le Supplier. Le consumer doit utiliser (en utilisant sa méthode accept())
-        //      le résultat du Supplier.
+        //TODO done
+        //: try-with-resources avec le Supplier. Le consumer doit utiliser (en utilisant sa méthode accept()) le résultat du Supplier.
+
+        consumer.accept(supplier.get());
+
     }
 
     /**
