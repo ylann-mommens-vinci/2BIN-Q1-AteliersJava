@@ -10,9 +10,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PrixTest {
-    Prix prixAucune;
-    Prix prixPub;
-    Prix prixSolde;
+    private Prix prixAucune;
+    private Prix prixPub;
+    private Prix prixSolde;
 
     @BeforeEach
     void setUp() {
