@@ -18,7 +18,8 @@ class MoniteurImplTest {
     }
     private void amenerALEtat(int etat, Moniteur moniteur) {
         for (int i = 1; i <= etat; i++) {
-            moniteur.ajouterStage(new StageStub(i, sportCompetent, null));
+            StageStub stageEnPlus =new StageStub(i, sportCompetent, null);
+            moniteur.ajouterStage(stageEnPlus);
         }
     }
 
