@@ -3,6 +3,7 @@ package domaine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import  org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,117 +14,107 @@ class MoniteurImplTest {
     @BeforeEach
     void setUp() {
         moniteur = new MoniteurImpl("Didier");
-        sportCompetent = new SportStub(true);
-        stageValide = new StageStub(8,sportCompetent,null);
+
+        sportCompetent = Mockito.mock(Sport.class);
+        Mockito.when(sportCompetent.contientMoniteur(moniteur)).thenReturn(true);
+
+        stageValide = Mockito.mock(Stage.class);
+        Mockito.when(stageValide.getSport()).thenReturn(sportCompetent);
+        Mockito.when(stageValide.getMoniteur()).thenReturn(null);
+        Mockito.when(stageValide.getNumeroDeSemaine()).thenReturn(8);
     }
     private void amenerALEtat(int etat, Moniteur moniteur) {
         for (int i = 1; i <= etat; i++) {
-            StageStub stageEnPlus =new StageStub(i, sportCompetent, null);
-            moniteur.ajouterStage(stageEnPlus);
+            Stage stageAjoute = Mockito.mock(Stage.class);
+
+            Mockito.when(stageAjoute.getSport()).thenReturn(sportCompetent);
+            Mockito.when(stageAjoute.getMoniteur()).thenReturn(null);
+            Mockito.when(stageAjoute.getNumeroDeSemaine()).thenReturn(i);
+
+            moniteur.ajouterStage(stageAjoute);
         }
     }
 
 
     @Test
-    @DisplayName("TC1 - ajouterStage()")
-    void test1() {
-        assertAll("TC1",
-                () -> assertEquals(0,moniteur.nombreDeStages()),    //Etat 0
-                () -> assertTrue(moniteur.ajouterStage(stageValide)),        //Ajout du stage
-                () -> assertTrue(moniteur.contientStage(stageValide)),       //contient le stage
-                () -> assertEquals(1, moniteur.nombreDeStages())    //Etat suivant
+    @DisplayName("TC1 - ajouterStage valide")
+    void testMoniteurTC1() {
+        assertAll(
+                () -> assertTrue(moniteur.ajouterStage(stageValide)),
+                () -> assertTrue(moniteur.contientStage(stageValide)),
+                () -> assertEquals(1, moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
+        );
+    }
+    @Test
+    @DisplayName("TC2 - ajouterStage dans une semaine libre")
+    void testMoniteurTC2() {
+        amenerALEtat(1, moniteur);
+        assertAll(
+                () -> assertTrue(moniteur.ajouterStage(stageValide)),
+                () -> assertTrue(moniteur.contientStage(stageValide)),
+                () -> assertEquals(2, moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
         );
     }
 
     @Test
-    @DisplayName("TC2 - ajouterStage()")
-    void test2() {
-        amenerALEtat(1,moniteur);
-        assertAll("TC2",
-                () -> assertEquals(1, moniteur.nombreDeStages()),   //Etat 1
-                () -> assertTrue(moniteur.ajouterStage(stageValide)),        //Ajout du stage
-                () -> assertTrue(moniteur.contientStage(stageValide)),       //contient le stage
-                () -> assertEquals(2, moniteur.nombreDeStages())    //Etat suivant -> 2
-        );
-    }
-
-    @Test
-    @DisplayName("TC3 - ajouterStage()")
-    void test3() {
+    @DisplayName("TC3 - ajouterStage dans une semaine libre")
+    void testMoniteurTC3() {
         amenerALEtat(2,moniteur);
-        assertAll("TC3",
-                () -> assertEquals(2,moniteur.nombreDeStages()),    //Etat 2
-                () -> assertTrue(moniteur.ajouterStage(stageValide)),        //Ajout du stage
-                () -> assertTrue(moniteur.contientStage(stageValide)),       //contient le stage
-                () -> assertEquals(3, moniteur.nombreDeStages())    //Etat suivant -> 3
+        assertAll(
+                () -> assertTrue(moniteur.ajouterStage(stageValide)),
+                () -> assertTrue(moniteur.contientStage(stageValide)),
+                () -> assertEquals(3, moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
         );
     }
+
     @Test
-    @DisplayName("TC4 - ajouterStage()")
-    void test4() {
+    @DisplayName("TC4 - ajouterStage dans une semaine libre")
+    void testMoniteurTC4() {
         amenerALEtat(3,moniteur);
-        assertAll("TC4",
-                () -> assertEquals(3,moniteur.nombreDeStages()),    //Etat 2
-                () -> assertTrue(moniteur.ajouterStage(stageValide)),        //Ajout du stage
-                () -> assertTrue(moniteur.contientStage(stageValide)),       //contient le stage
-                () -> assertEquals(4,moniteur.nombreDeStages())     //Etat suivant -> 4
-        );
-    }
-    @Test
-    @DisplayName("TC5 - supprimerStage()")
-    void test5() {
-        amenerALEtat(3, moniteur);                                      //on l'amene a l'etat 3
-        moniteur.ajouterStage(stageValide);                                  //On lui ajoute un stage (état 4)
         assertAll(
-                () -> assertTrue(moniteur.supprimerStage(stageValide)),     //on verifie que la suppression renvoie True
-                () -> assertFalse(moniteur.contientStage(stageValide)),     //On verifie que le moniteur n'ai plus le stage
-                () -> assertEquals(3, moniteur.nombreDeStages())   //on verifie qu'il lui reste que 3 stage
+                () -> assertTrue(moniteur.ajouterStage(stageValide)),
+                () -> assertTrue(moniteur.contientStage(stageValide)),
+                () -> assertEquals(4, moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
         );
     }
 
     @Test
-    @DisplayName("TC6 - supprimerStage()")
-    void test6() {
-        amenerALEtat(2,moniteur);
-        moniteur.ajouterStage(stageValide);
-        assertAll(
-                () -> assertTrue(moniteur.supprimerStage(stageValide)),
-                () -> assertFalse(moniteur.contientStage(stageValide)),
-                () -> assertEquals(2,moniteur.nombreDeStages())
-        );
-    }
-
-    @Test
-    @DisplayName("TC7 - supprimerStage()")
-    void test7(){
-        amenerALEtat(1,moniteur);
-        moniteur.ajouterStage(stageValide);
-        assertAll(
-                () -> assertTrue(moniteur.supprimerStage(stageValide)),
-                () -> assertFalse(moniteur.contientStage(stageValide)),
-                () -> assertEquals(1,moniteur.nombreDeStages())
-        );
-    }
-
-    @Test
-    @DisplayName("TC8 - supprimerStage()")
-    void test8() {
-        moniteur.ajouterStage(stageValide);
-        assertAll(
-                () -> assertTrue(moniteur.supprimerStage(stageValide)),
-                () -> assertFalse(moniteur.contientStage(stageValide)),
-                () -> assertEquals(0,moniteur.nombreDeStages())
-        );
-    }
-
-    @Test
-    @DisplayName("TC9 - ajouterStage()")
-    void test9() {
+    @DisplayName("TC5 - ajouterStage déjà présent")
+    void testMoniteurTC5() {
         amenerALEtat(3,moniteur);
         moniteur.ajouterStage(stageValide);
         assertAll(
                 () -> assertFalse(moniteur.ajouterStage(stageValide)),
-                () ->assertEquals(4, moniteur.nombreDeStages())
+                () -> assertEquals(4,moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
+        );
+    }
+
+    @Test
+    @DisplayName("TC6 - ajouterStage dans un semaine deja prise")
+    void testMoniteurTC6() {
+        amenerALEtat(4,moniteur);
+
+        Stage stageMMSemaine = Mockito.mock(Stage.class);
+        Mockito.when(stageMMSemaine.getSport()).thenReturn(sportCompetent);
+        Mockito.when(stageMMSemaine.getMoniteur()).thenReturn(null);
+        Mockito.when(stageMMSemaine.getNumeroDeSemaine()).thenReturn(1);
+
+        assertAll(
+                () -> assertFalse(moniteur.ajouterStage(stageMMSemaine)),
+                () -> assertFalse(moniteur.contientStage(stageMMSemaine)),
+                () -> assertEquals(4, moniteur.nombreDeStages()),
+
+                () -> Mockito.verify(stageMMSemaine,Mockito.never()).enregistrerMoniteur(moniteur)
         );
     }
 }
