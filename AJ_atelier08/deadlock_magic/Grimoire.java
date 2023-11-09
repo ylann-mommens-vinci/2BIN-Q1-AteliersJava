@@ -1,5 +1,9 @@
 package deadlock_magic;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 public class Grimoire {
 
 
@@ -28,22 +32,42 @@ public class Grimoire {
             this.incantation3 = incantation3;
         }
 
-        public void debuter(){
+        public void debuter() {
             System.out.println(name() + " débute");
-            synchronized (incantation1){
-                System.out.println(incantation1 + " pris pour " + name());
-                mediter();
-                synchronized (incantation2){
-                    System.out.println(incantation2 + " pris pour " + name());
+
+            // Utiliser une méthode pour éviter le deadlock
+            prendreIncantationsDansOrdre();
+
+            System.out.println(name() + " lancé !");
+        }
+
+        private void prendreIncantationsDansOrdre() {
+            List<Incantation> incantations = Arrays.asList(incantation1, incantation2, incantation3);
+            incantations.sort(Comparator.comparing(Enum::name));
+
+            Incantation incantationN1 = incantations.get(0) ;
+            Incantation incantationN2 = incantations.get(1);
+            Incantation incantationN3 = incantations.get(2);
+
+            //Une seul incantation peut etre prise a la fois
+            synchronized (Grimoire.class) {
+                //Un magicien doit acquérir le verrou sur cette incantation avant de pouvoir continuer.
+                // Si un autre magicien détient déjà le verrou sur cette incantation, le magicien actuel attendra jusqu'à ce que le verrou soit libéré
+                synchronized (incantationN1) {
+                    System.out.println(incantationN1 + " pris pour " + name());
                     mediter();
-                    synchronized (incantation3){
-                        System.out.println(incantation3 + " pris pour " + name());
+                    synchronized (incantationN2) {
+                        System.out.println(incantationN2 + " pris pour " + name());
                         mediter();
-                        System.out.println(name() + " lancé !");
+                        synchronized (incantationN3) {
+                            System.out.println(incantationN3 + " pris pour " + name());
+                            mediter();
+                        }
                     }
                 }
             }
         }
+
 
         public void mediter(){
             System.out.println("Méditation");
