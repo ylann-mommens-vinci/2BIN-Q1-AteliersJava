@@ -24,15 +24,22 @@ public class CompteurThread extends Thread {
         for (int i = 0; i <= max ; i++) {
             System.out.println(nom+": "+i);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
             }catch(InterruptedException exception){
                 exception.printStackTrace();
             }
         }
-        //2. Quand le compte est terminé, afficher que le compteur a finit de compter
+        //2. Quand le compte est terminé, afficher que le compteur a fini de compter
+        synchronized (this.getClass()){
+            try {
+                Thread.sleep(1000);
+            }catch (InterruptedException exception){
+                exception.printStackTrace();
+            }
 
-        System.out.println(nom+" a fini de compter jusqu'a "+max);
-        if (gagnant==null) gagnant = this;
+            System.out.println(nom+" a fini de compter jusqu'a "+max);
+            if (gagnant==null) gagnant = this;
+        }
     }
 
     public static CompteurThread getGagnant() {
