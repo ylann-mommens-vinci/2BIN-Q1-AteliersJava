@@ -5,6 +5,7 @@ import jakarta.json.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.logging.Logger;
 
 /**
@@ -74,8 +75,9 @@ public class ClassAnalyzer {
 
         objectBuilder.add("Name",m.getName());
         //objectBuilder.add("Type",);
-        //objectBuilder.add("visibility",);
-        //objectBuilder.add("parameters",);
+        objectBuilder.add("Method visibility",getMethodVisibility(m));
+        objectBuilder.add("parametersType",getParametersType(m));
+        //objectBuilder.add("parameters",getParameters(m));
         objectBuilder.add("return",m.getReturnType().getSimpleName());
         return objectBuilder.build();
     }
@@ -85,7 +87,24 @@ public class ClassAnalyzer {
         for (Method m: aClass.getDeclaredMethods()) {
             arrayBuilder.add(getMethod(m));
         }
-        return null;
+        return arrayBuilder.build();
+    }
+
+    private JsonArray getParametersType(Method m){
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        for (Parameter p:m.getParameters()) {
+            arrayBuilder.add(p.getType().getSimpleName());
+        }
+        return arrayBuilder.build();
+    }
+    private String getMethodVisibility(Method m){
+        if (Modifier.isPrivate(m.getModifiers()))
+            return "private";
+        if (Modifier.isPublic(m.getModifiers()))
+            return "public";
+        if (Modifier.isProtected(m.getModifiers()))
+            return "protected";
+        return "package";
     }
 
     /**

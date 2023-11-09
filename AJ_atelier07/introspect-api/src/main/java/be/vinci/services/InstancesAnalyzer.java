@@ -3,6 +3,7 @@ package be.vinci.services;
 import jakarta.json.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * Instances analyzer. It saves an instance into attribute, from a constructor, and
@@ -27,7 +28,8 @@ public class InstancesAnalyzer {
      */
     public JsonObject getFullInfo() {
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-        // TODO add missing data
+        // TODO done add missing data
+        objectBuilder.add("classname",anInstance.getClass().getSimpleName());
         objectBuilder.add("fields", getFields());
         return objectBuilder.build();
     }
@@ -47,6 +49,16 @@ public class InstancesAnalyzer {
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         // TODO add missing info
         // TODO if type is an object (except String), ignore the value and do not send the value.
+
+        objectBuilder.add("name",f.getName());
+        objectBuilder.add("type",f.getType().getSimpleName());
+        if(f.getType().getSimpleName().equals("String")){
+            try {
+
+            }catch(IllegalAccessException ignored){}
+        }
+        objectBuilder.add("isStatic", Modifier.isFinal(f.getModifiers()));
+
         return objectBuilder.build();
     }
 
