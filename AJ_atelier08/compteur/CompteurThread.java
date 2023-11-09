@@ -20,9 +20,19 @@ public class CompteurThread extends Thread {
 
     @Override
     public void run() {
-        //TODO: 1. Compter jusqu'à max
-        //         A chaque incrémentation, afficher le nom du compteur et son compte actuel.
-        //      2. Quand le compte est terminé, afficher que le compteur a finit de compter
+        //1. Compter jusqu'à max -> A chaque incrémentation, afficher le nom du compteur et son compte actuel.
+        for (int i = 0; i <= max ; i++) {
+            System.out.println(nom+": "+i);
+            try {
+                Thread.sleep(1000);
+            }catch(InterruptedException exception){
+                exception.printStackTrace();
+            }
+        }
+        //2. Quand le compte est terminé, afficher que le compteur a finit de compter
+
+        System.out.println(nom+" a fini de compter jusqu'a "+max);
+        if (gagnant==null) gagnant = this;
     }
 
     public static CompteurThread getGagnant() {
