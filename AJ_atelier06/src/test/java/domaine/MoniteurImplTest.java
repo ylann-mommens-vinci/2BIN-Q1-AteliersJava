@@ -18,7 +18,9 @@ class MoniteurImplTest {
         sportCompetent = Mockito.mock(Sport.class);
         Mockito.when(sportCompetent.contientMoniteur(moniteur)).thenReturn(true);
 
+        //On cree le mock
         stageValide = Mockito.mock(Stage.class);
+        //On defini le comportement du mock
         Mockito.when(stageValide.getSport()).thenReturn(sportCompetent);
         Mockito.when(stageValide.getMoniteur()).thenReturn(null);
         Mockito.when(stageValide.getNumeroDeSemaine()).thenReturn(8);
@@ -35,7 +37,6 @@ class MoniteurImplTest {
         }
     }
 
-
     @Test
     @DisplayName("TC1 - ajouterStage valide")
     void testMoniteurTC1() {
@@ -44,6 +45,7 @@ class MoniteurImplTest {
                 () -> assertTrue(moniteur.contientStage(stageValide)),
                 () -> assertEquals(1, moniteur.nombreDeStages()),
 
+                //On verifie que la méthode enregistrerMoniteur a été appellé sur stageValide
                 () -> Mockito.verify(stageValide).enregistrerMoniteur(moniteur)
         );
     }
