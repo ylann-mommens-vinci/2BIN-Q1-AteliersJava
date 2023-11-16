@@ -8,6 +8,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class Main {
 
@@ -16,7 +17,14 @@ public class Main {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         // Spécifier l'URL de la requête GET
-        String url = "https://duckduckgo.com/";
+        String url;
+        try {
+            System.out.println("Veuillez entrer l'url d'un site web (ex: https://www.google.com/): ");
+            Scanner scanner = new Scanner(System.in);
+            url = scanner.nextLine();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // Créer une requête GET
         HttpGet httpGet = new HttpGet(url);
