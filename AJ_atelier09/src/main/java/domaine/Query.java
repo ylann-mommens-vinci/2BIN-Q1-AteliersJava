@@ -1,29 +1,15 @@
 package domaine;
 
-public class Query {
+public interface Query {
     public enum QueryMethod {
         GET, POST
     }
+    
+    String getUrl();
 
-    private String url;
-    private QueryMethod method;
+    void setUrl(String url);
 
-    public Query(String url,QueryMethod method){
-        this.url=url;
-        this.method=method;
-    }
+    QueryImpl.QueryMethod getMethod();
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-    public QueryMethod getMethod() {
-        return method;
-    }
-    public void setMethod(QueryMethod method) {
-        this.method = method;
-    }
+    void setMethod(QueryImpl.QueryMethod method);
 }
