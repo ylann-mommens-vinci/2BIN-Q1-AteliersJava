@@ -36,4 +36,23 @@ public class TodoListTest {
         todoList.addTask("task 1");
         assertFalse(todoList.addTask("task 1"));
     }
+
+    @Test
+    void removeTask() {
+        assertAll(
+                () -> assertTrue(todoList.addTask("task")),
+                () -> assertTrue(todoList.containsTask("task")),
+                () -> assertTrue(todoList.removeTask("task")),
+                () -> assertFalse(todoList.containsTask("task"))
+        );
+    }
+
+    @Test
+    void removeUnexistingTask() {
+        assertAll(
+                () -> assertFalse(todoList.removeTask("task")),
+                () -> assertFalse(todoList.removeTask("")),
+                () -> assertFalse(todoList.removeTask(null))
+        );
+    }
 }

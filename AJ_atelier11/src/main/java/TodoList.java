@@ -16,4 +16,11 @@ public class TodoList {
     public boolean containsTask(String t) {
         return tasks.contains(t);
     }
+
+    public boolean removeTask(String t) {
+        if(t == null) return false;
+        if(t.isBlank()) return false;
+        if(!tasks.contains(t)) return false;
+        return tasks.remove(t);
+    }
 }
